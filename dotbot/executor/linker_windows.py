@@ -1,4 +1,5 @@
 import os
+import subprocess
 import win32file # FIXME try catch?
 from . import Executor
 
@@ -60,6 +61,30 @@ class LinkerWindows7(Executor):
         return os.path.exists(path)
 
     def _link(self, source, link_name):
+        '''This will clean links as well before linking, because windows has issues with it'''
+
+        tSourceFullPath = os.path.normpath(os.path.join(self._base_directory, source))
+
+        tCommandTemplate = 'cmd /c mklink {tOptions} {tLinkName} {tTarget}'
+      
+        if os.path.isfile(tSourceFullPath):
+            tOptions = ''
+        elif os.path.isdir(tSourceFullPath):
+            tOptions = '/D'
+        else:
+            raise Exception('Neither a file nor directory.')
+
+        tCommand = tCommandTemplate.format(
+            tOptions=tOptions,
+            tLinkName=os.path.normpath(link_name),
+            tTarget=tSourceFullPath)
+        
+        print 'Command = {}'.format(tCommand)
+        subprocess.check_call(tCommand, shell=True)
+
+        return True
+        ##########################################################
+
         '''
         Links link_name to source.
 

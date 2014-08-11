@@ -82,3 +82,5 @@ if symlink file, use del
 
 getfileattributes = -1 if not there ..... 1040 if dir link, 1056 if file
 requires win32file
+
+win32file.GetFileAttributes('D:\\Desktop\\ones')

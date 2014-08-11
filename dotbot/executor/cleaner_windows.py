@@ -1,7 +1,7 @@
 import os
 from . import Executor
 
-class Cleaner(Executor):
+class CleanerWindows7(Executor):
     '''
     Cleans broken symbolic links.
     '''
@@ -31,7 +31,7 @@ class Cleaner(Executor):
         Cleans all the broken symbolic links in target that point to
         a subdirectory of the base directory.
         '''
-        print 'cleaning!!!!'
+
         for item in os.listdir(os.path.expanduser(target)):
             path = os.path.join(os.path.expanduser(target), item)
             if not os.path.exists(path) and os.path.islink(path):
