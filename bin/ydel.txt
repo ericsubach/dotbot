@@ -1,0 +1,84 @@
+  def makeLink(self, aFileOrDirPathSource, aDestinationDir):
+      if not self.options.dryRun:
+         print 'Making link for {} to {}'.format(aFileOrDirPathSource, aDestinationDir)
+      else:
+         print 'Would have hade link for {} to {}'.format(aFileOrDirPathSource, aDestinationDir)
+         return
+   
+      if False:
+      #if self.options.cygwin:
+         pass
+      else:
+         tCommandTemplate = 'cmd /c mklink {tOptions} {tLinkName} {tTarget}'
+      
+         if os.path.isfile(aFileOrDirPathSource):
+            tOptions = ''
+         elif os.path.isdir(aFileOrDirPathSource):
+            tOptions = '/D'
+         else:
+            raise Exception('Neither a file nor directory.')
+         
+         with stowlite.helper.cd(aDestinationDir):
+            tCommand = tCommandTemplate.format(
+               tOptions=tOptions,
+               tLinkName=os.path.basename(aFileOrDirPathSource),
+               tTarget=aFileOrDirPathSource)
+            #print 'tCommand = ' + tCommand
+            
+            tDestinationFilePath = os.path.join(aDestinationDir, os.path.basename(aFileOrDirPathSource))
+            if os.path.lexists(tDestinationFilePath):
+               # If the destination already exists, delete it first.
+               if os.path.isfile(tDestinationFilePath):
+                  os.remove(tDestinationFilePath)
+               elif os.path.isdir(tDestinationFilePath):
+                  #os.rmdir(tDestinationFilePath)
+                  # FIXME This causes some problems if the symlink is still there from the first run.
+                  os.unlink(tDestinationFilePath)
+               else:
+                  raise Exception('Neither a file nor directory.')
+            
+            # Create the link.
+            subprocess.check_call(tCommand, shell=True)
+
+======================
+
+D:\Test\one
+D:\Desktop
+
+(link one on test to the desktop)
+mklink /d D:\Desktop\one D:\Test\one
+
+C:\Windows\system32>mklink /d D:\Desktop\one D:\Test\one
+symbolic link created for D:\Desktop\one <<===>> D:\Test\one
+
+need shell=True to suppress window
+need 
+
+8.4
+--> 4.2
+
+
+
+junction/link?
+
+
+Symlink = D:\Desktop\one
+RealDir = D:\Test\one
+
+=====================
+File Folder (SymLink)
+=====================
+
+os.path.isfile = False
+os.path.abspath = 'D:\\Desktop\\one'
+os.path.exists = True (regardless if broken)
+os.path.islink = False
+os.path.realpath = 'D:\\Desktop\\one'
+
+if symlink dir, use rmdir
+if symlink file, use del
+
+==============
+
+getfileattributes = -1 if not there ..... 1040 if dir link, 1056 if file
+requires win32file

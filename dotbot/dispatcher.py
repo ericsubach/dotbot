@@ -41,6 +41,7 @@ class Dispatcher(object):
     def _load_plugins(self):
         self._plugins = [plugin(self._base_directory)
             for plugin in Executor.__subclasses__()]
+        print '# plugins = {}'.format(len(self._plugins))
 
 class DispatchError(Exception):
     pass

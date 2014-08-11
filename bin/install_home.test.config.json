@@ -1,0 +1,20 @@
+[
+    {
+        "clean_windows": []
+    },
+    {
+        "link_windows":
+        {
+            "C:/cygwin/home/Eric/test/": "test/"
+        }
+    },
+    {
+        "shell":
+        [
+            
+        ]
+    },
+    {
+       "_comment": ["starting in the bin dir", "./dotbot -d . -c ./install_home.test.config.json"]
+    }
+]

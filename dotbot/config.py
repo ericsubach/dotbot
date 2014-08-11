@@ -9,8 +9,9 @@ class ConfigReader(object):
             with open(config_file_path) as fin:
                 data = json.load(fin)
             return data
-        except Exception:
-            raise ReadingError('Could not read config file')
+        except Exception as tExcept:
+            print tExcept
+            raise ReadingError('Could not read config file at {}'.format(config_file_path))
 
     def get_config(self):
         return self._config
