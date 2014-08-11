@@ -65,6 +65,8 @@ class LinkerWindows7(Executor):
 
         tSourceFullPath = os.path.normpath(os.path.join(self._base_directory, source))
 
+        # FIXME need to check the link to see if exists and delete it first.
+
         tCommandTemplate = 'cmd /c mklink {tOptions} {tLinkName} {tTarget}'
       
         if os.path.isfile(tSourceFullPath):
