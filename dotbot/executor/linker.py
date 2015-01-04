@@ -1,4 +1,4 @@
-import os
+import os, shutil
 from . import Executor
 
 class Linker(Executor):
@@ -19,7 +19,18 @@ class Linker(Executor):
     def _process_links(self, links):
         success = True
         for destination, source in links.items():
-            success &= self._link(source, destination)
+            if isinstance(source, dict):
+                # extended config
+                path = source['path']
+                force = source.get('force', False)
+                create = source.get('create', False)
+                if create:
+                    success &= self._create(destination)
+                if force:
+                    success &= self._delete(path, destination)
+            else:
+                path = source
+            success &= self._link(path, destination)
         if success:
             self._log.info('All links have been set up')
         else:
@@ -46,6 +57,37 @@ class Linker(Executor):
         '''
         path = os.path.expanduser(path)
         return os.path.exists(path)
+
+    def _create(self, path):
+        success = True
+        parent = os.path.abspath(os.path.join(os.path.expanduser(path), os.pardir))
+        if not self._exists(parent):
+            try:
+                os.makedirs(parent)
+            except OSError:
+                self._log.warning('Failed to create directory %s' % parent)
+                success = False
+            else:
+                self._log.lowinfo('Creating directory %s' % parent)
+        return success
+
+    def _delete(self, source, path):
+        success = True
+        source = os.path.join(self._base_directory, source)
+        if ((self._is_link(path) and self._link_destination(path) != source) or
+                (self._exists(path) and not self._is_link(path))):
+            fullpath = os.path.expanduser(path)
+            try:
+                if os.path.isdir(fullpath):
+                    shutil.rmtree(fullpath)
+                else:
+                    os.remove(fullpath)
+            except OSError:
+                self._log.warning('Failed to remove %s' % path)
+                success = False
+            else:
+                self._log.lowinfo('Removing %s' % path)
+        return success
 
     def _link(self, source, link_name):
         '''
